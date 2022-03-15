@@ -42,6 +42,5 @@ export async function addVersion(fileId, name) {
   const file = files.find(f => f.id === fileId);
   const versionId = file.versions[0].id + 1;
   file.versions = [{id: versionId, name}, ...file.versions]; 
-  debugger;
   return files;
 }
