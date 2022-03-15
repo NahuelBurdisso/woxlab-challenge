@@ -48,7 +48,7 @@ export default function Files() {
   return (
     <>
       <button onClick={handleSortFilesClick}>{filesSortedAsc ? 'Sort Z-A' : 'Sort A-Z'}</button>
-      {files.length > 0 && files.map(file => <FileItem file={file} setFiles={setFiles} asc={filesSortedAsc} key={file.id} />) }
+      {files.length > 0 && files.map(file => <FileItem file={file} setFiles={setFiles} filesSortedAsc={filesSortedAsc} key={file.id} />) }
       <button onClick={handleAddFileClick}>Add file</button>
     </>
   );
