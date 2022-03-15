@@ -1,4 +1,4 @@
-const files = [
+export const files = [
   {
     id: 'the-file-id-1',
     versions: [
@@ -26,13 +26,22 @@ export async function getFiles() {
   return files;
 }
 
-export async function addFile(name) {
-  // TODO: Implement this API to add a new file according to task (5).
+export async function addFile(fileName) {
+  // This id creation is quite messy, the best option would be to use unique ids, libraries such as uuid might be useful
+  const newFile = {
+    id: `the-file-id-${files.length + 1}`,
+    versions: [
+      { id: 0, name: fileName}
+    ]
+  };
+  files.push(newFile);
+  return files;
 }
 
 export async function addVersion(fileId, name) {
-  // TODO: Insert the new version on the beginning of the stack according to task (1)
   const file = files.find(f => f.id === fileId);
-  const versionId = file.versions[file.versions.length - 1].id + 1;
-  file.versions.push({ id: versionId, name });
+  const versionId = file.versions[0].id + 1;
+  file.versions = [{id: versionId, name}, ...file.versions]; 
+  debugger;
+  return files;
 }

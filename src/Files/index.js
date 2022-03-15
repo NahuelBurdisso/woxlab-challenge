@@ -1,47 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { useFiles } from './use-files';
-import { addVersion } from '../api';
+import { getFiles, addFile } from '../api';
 
-import styles from './index.module.css';
+import FileItem from '../FileItem';
 
-// TODO: Improve the implementation of this component according to task (4)
-function File({ file }) {
+import { sortFiles } from '../utils/sortFiles';
 
-  const onRename = () => {
-    const newName = window.prompt('Rename this file');
-    addVersion(file.id, newName);
+export default function Files() {
+  const [files, setFiles] = useState([]);
+  const [filesSortedAsc, setFilesSortedAsc] = useState(false);
+
+  useEffect(() => {
+    getFiles().then(filesResponse => {
+      const sortedFiles = sortFiles(filesResponse, true);
+      setFiles(sortedFiles);
+      setFilesSortedAsc(true);
+    });
+  }, []);
+  
+  /* 
+  Req 2: The approach to achieve the update of the variable files when the list 
+  is updated would be this one:
+    useEffect(() => {
+      setFiles(files);
+    }, [files]);
+  However I choose to update the file component with whatever comes back from the API
+  this helped me avoid mutability issues and keep a consistent flow of the state and
+  state update.
+  */
+
+  const handleSortFilesClick = () => {
+    const sortedFiles = sortFiles(files, !filesSortedAsc);
+    setFiles(sortedFiles);
+    setFilesSortedAsc(!filesSortedAsc);
+  }
+
+  const handleAddFileClick = () => {
+    const newFileName = window.prompt('New file name');
+    if (newFileName) {
+      addFile(newFileName).then(files => {
+        const sortedFiles = sortFiles(files, filesSortedAsc);
+        setFiles(sortedFiles);
+      });
+    }
   }
 
   return (
-    <div className={styles.file}>
-      <strong>{file.versions[0].name}</strong>
-      <button onClick={onRename}>Rename</button>
-      <ul>
-        { file.versions.map(version => (
-          <li key={version.id}>
-            { version.name }
-          </li>
-        )) }
-      </ul>
-    </div>
-  );
-}
-
-export default function Files() {
-  // TODO: Replace this polling-like implementation according to task (2)
-  const [ state, setState ] = React.useState();
-  setInterval(() => setState(Math.random()), 1000);
-
-  const files = useFiles();
-  return (
     <>
-      {/* TODO: Implement sort feature according to task (3) */}
-      <button>Sort A-Z/Z-A</button>
-      {
-        files.map(file => <File file={file} key={file.id} />)
-      }
-      {/* TODO: Add a button to add a new file according to task (5) */}
+      <button onClick={handleSortFilesClick}>{filesSortedAsc ? 'Sort Z-A' : 'Sort A-Z'}</button>
+      {files.length > 0 && files.map(file => <FileItem file={file} setFiles={setFiles} asc={filesSortedAsc} key={file.id} />) }
+      <button onClick={handleAddFileClick}>Add file</button>
     </>
   );
 }
